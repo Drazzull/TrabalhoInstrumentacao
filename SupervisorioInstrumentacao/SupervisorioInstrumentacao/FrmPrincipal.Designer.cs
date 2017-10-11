@@ -132,7 +132,7 @@
             this.btnConectar.Name = "btnConectar";
             this.btnConectar.Size = new System.Drawing.Size(90, 25);
             this.btnConectar.TabIndex = 19;
-            this.btnConectar.Text = "Conectar";
+            this.btnConectar.Text = "Ler Dados";
             this.btnConectar.UseVisualStyleBackColor = true;
             this.btnConectar.Click += new System.EventHandler(this.btnConectar_Click);
             // 

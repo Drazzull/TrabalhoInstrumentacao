@@ -13,6 +13,16 @@
         /// Lista que conterá os caracteres recebidos
         /// </summary>
         private List<byte> listaBytes;
+
+        /// <summary>
+        /// Lista que conterá os caracteres recebidos
+        /// </summary>
+        private List<double> listaDouble;
+
+        /// <summary>
+        /// Lista que conterá os caracteres recebidos
+        /// </summary>
+        private List<char> listaChar;
         #endregion
 
         #region Propriedades
@@ -34,6 +44,38 @@
                 }
 
                 return this.listaBytes;
+            }
+        }
+
+        /// <summary>
+        /// Obtém ou define o valor da lista de bytes
+        /// </summary>
+        private List<char> ListaChar
+        {
+            get
+            {
+                if (this.listaChar == null)
+                {
+                    this.listaChar = new List<char>();
+                }
+
+                return this.listaChar;
+            }
+        }
+
+        /// <summary>
+        /// Obtém ou define o valor da lista de double
+        /// </summary>
+        private List<double> ListaDouble
+        {
+            get
+            {
+                if (this.listaDouble == null)
+                {
+                    this.listaDouble = new List<double>();
+                }
+
+                return this.listaDouble;
             }
         }
 
@@ -87,25 +129,42 @@
                     throw new Exception("A porta selecionada é inválida.");
                 }
 
-                if (this.Conexao.IsOpen)
-                {
-                    this.txtResultadoSerial.AppendText("Enviado: #P" + Environment.NewLine);
-                    this.Conexao.Write("#P");
-                    this.Conexao.Close();
-                    this.btnConectar.Text = "Conectar";
-                    this.txtResultadoSerial.AppendText("Desconectado com Sucesso" + Environment.NewLine);
-                    return;
-                }
-
+                // Inicia a conexão
                 this.Conexao.PortName = this.cmbPortas.SelectedItem.ToString();
                 this.Conexao.BaudRate = int.Parse(this.cmbVelocidade.SelectedItem.ToString());
                 this.Conexao.Open();
-                this.btnConectar.Text = "Desconectar";
+                this.Conexao.DiscardInBuffer();
                 this.txtResultadoSerial.AppendText("Enviado: #C7" + Environment.NewLine);
                 this.Conexao.Write("#C7");
+                this.txtResultadoSerial.AppendText(this.Conexao.ReadLine());
                 this.txtResultadoSerial.AppendText("Enviado: #SS" + Environment.NewLine);
                 this.Conexao.Write("#SS");
                 this.txtResultadoSerial.AppendText("Conectado com Sucesso" + Environment.NewLine);
+
+                // Limpa a lista
+                this.ListaBytes.Clear();
+
+                // Aguarda 5 segundos
+                Thread.Sleep(5000);
+
+                // Verifica o número de bytes a serem lidos
+                int byteCount = this.Conexao.BytesToRead;
+
+                // Cria um array para conter o buffer, do tamanho necessário
+                char[] buffer = new char[byteCount];
+
+                // Faz a leitura dos bytes
+                int readBytes = this.Conexao.Read(buffer, 0, byteCount);
+
+                // Acrescenta os bytes à lista
+                this.ListaChar.AddRange(buffer);
+
+                // Para a Conexão
+                this.txtResultadoSerial.AppendText("Enviado: #P" + Environment.NewLine);
+                this.Conexao.Write("#P");
+                this.Conexao.Close();
+
+                this.txtResultadoSerial.AppendText("Serial Parada.");
             }
             catch (Exception ex)
             {
@@ -122,7 +181,7 @@
                     MessageBoxIcon.Error);
             }
         }
-        
+
         /// <summary>
         /// Evento DataReceived da conexão serial
         /// </summary>
@@ -132,30 +191,7 @@
         {
             try
             {
-                // Limpa a lista
-                this.ListaBytes.Clear();
 
-                // Aguarda 5 segundos
-                Thread.Sleep(5000);
-
-                // Verifica o número de bytes a serem lidos
-                int byteCount = this.Conexao.BytesToRead;
-                
-                // Se o ponteiro está no fim do arquivo
-                if (e.EventType == SerialData.Eof)
-                {
-                    MessageBox.Show("Terminou");
-                    return;
-                }
-
-                // Cria um array para conter o buffer, do tamanho necessário
-                byte[] buffer = new byte[byteCount];
-
-                // Faz a leitura dos bytes
-                int readBytes = this.Conexao.Read(buffer, 0, byteCount);
-
-                // Acrescenta os bytes à lista
-                this.ListaBytes.AddRange(buffer);
             }
             catch
             {
