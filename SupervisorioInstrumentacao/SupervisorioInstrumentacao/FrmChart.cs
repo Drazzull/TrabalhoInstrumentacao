@@ -135,7 +135,6 @@
             {
                 // Limpa os pontos do gráfico
                 this.TamanhoEixoX = this.ListaDouble.Count;
-                
                 this.Invoke(new EventHandler(this.AtualizarGrafico));
 
                 // Ajusta o salto
