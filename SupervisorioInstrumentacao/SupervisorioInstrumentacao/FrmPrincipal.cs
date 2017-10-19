@@ -151,28 +151,31 @@
                 }
 
                 // Inicia a conexão
-                this.Conexao.ReadBufferSize = 10000;
-                this.Conexao.WriteBufferSize = 10000;
+                this.Conexao.ReadBufferSize = 20000;
+                this.Conexao.WriteBufferSize = 20000;
                 this.Conexao.PortName = this.cmbPortas.SelectedItem.ToString();
                 this.Conexao.BaudRate = int.Parse(this.cmbVelocidade.SelectedItem.ToString());
                 this.Conexao.Open();
                 this.Conexao.DiscardInBuffer();
-                this.txtResultadoSerial.AppendText("Enviado: #C7" + Environment.NewLine);
-                this.Conexao.Write("#C7");
-                this.txtResultadoSerial.AppendText(this.Conexao.ReadLine() + Environment.NewLine);
-                this.txtResultadoSerial.AppendText("Enviado: #SS" + Environment.NewLine);
-                this.Conexao.Write("#SS");
+                //this.txtResultadoSerial.AppendText("Enviado: #C7" + Environment.NewLine);
+                //this.Conexao.Write("#C7");
+                //th1is.txtResultadoSerial.AppendText(this.Conexao.ReadLine() + Environment.NewLine);
+                //this.txtResultadoSerial.AppendText("Enviado: #SS" + Environment.NewLine);
+                //this.Conexao.Write("#SS");
                 this.txtResultadoSerial.AppendText("Conectado com Sucesso" + Environment.NewLine);
 
                 // Limpa a lista
                 this.ListaBytes.Clear();
+                this.ListaChar.Clear();
+                this.ListaDouble.Clear();
+                this.Conexao.DiscardInBuffer();
 
-                // Aguarda 5 segundos
+                // Obtém a leitura de 1000 amostras
                 int contador = 0;
                 do
                 {
                     contador = this.Conexao.BytesToRead;
-                } while (contador < 6000);
+                } while (contador < 10000);
 
                 // Verifica o número de bytes a serem lidos
                 int byteCount = this.Conexao.BytesToRead;
@@ -349,12 +352,13 @@
             {
                 if (teste == '[')
                 {
+                    resultado = string.Empty;
                     continue;
                 }
 
                 if (teste == ']')
                 {
-                    this.ListaDouble.Add(Convert.ToDouble(resultado));
+                    this.ListaDouble.Add(Convert.ToDouble(resultado.Replace('.', ',')));
                     continue;
                 }
 

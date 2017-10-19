@@ -135,6 +135,7 @@
             {
                 // Limpa os pontos do gráfico
                 this.TamanhoEixoX = this.ListaDouble.Count;
+                
                 this.Invoke(new EventHandler(this.AtualizarGrafico));
 
                 // Ajusta o salto
@@ -144,29 +145,22 @@
                 this.Invoke(new EventHandler(this.UpdateGrafico));
 
                 // Atualiza o gráfico
+                int contador = 0;
                 foreach (double valor in this.ListaDouble)
                 {
-                    int contador = 0;
-                    while (true)
+                    contador++;
+                    if (contador > this.Salto)
                     {
-                        contador++;
-                        if (contador > this.Salto)
-                        {
-                            this.Invoke(new EventHandler(this.UpdateGrafico));
-                            contador = 0;
-                        }
-
-                        string valorLinha = valor.ToString();
-                        if (string.IsNullOrEmpty(valorLinha))
-                        {
-                            this.Invoke(new EventHandler(this.UpdateGrafico));
-                            break;
-                        }
-
-                        this.EixoY = Convert.ToDouble(valorLinha.Replace('.', ','));
-                        this.Invoke(new EventHandler(this.AdicionaPontoGrafico));
+                        this.Invoke(new EventHandler(this.UpdateGrafico));
+                        contador = 0;
                     }
+
+                    string valorLinha = valor.ToString();
+                    this.EixoY = Convert.ToDouble(valorLinha);
+                    this.Invoke(new EventHandler(this.AdicionaPontoGrafico));
                 }
+
+                this.Invoke(new EventHandler(this.UpdateGrafico));
             }
             catch (Exception exp)
             {
