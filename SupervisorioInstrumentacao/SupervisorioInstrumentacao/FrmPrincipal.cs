@@ -28,6 +28,11 @@
         /// Lista que conterá os caracteres recebidos
         /// </summary>
         private List<char> listaChar;
+
+        /// <summary>
+        /// Lista que conterá os valores da FFT
+        /// </summary>
+        private List<double> listaDoubleFft;
         #endregion
 
         #region Propriedades
@@ -101,6 +106,22 @@
         }
 
         /// <summary>
+        /// Obtém ou define o valor da lista de doubles da FFT
+        /// </summary>
+        private List<double> ListaDoubleFft
+        {
+            get
+            {
+                if (this.listaDoubleFft == null)
+                {
+                    this.listaDoubleFft = new List<double>();
+                }
+
+                return this.listaDoubleFft;
+            }
+        }
+
+        /// <summary>
         /// Obtém ou define o valor da variável para término da leitura de dados
         /// </summary>
         private DateTime TerminoLeituraDados { get; set; }
@@ -157,11 +178,6 @@
                 this.Conexao.BaudRate = int.Parse(this.cmbVelocidade.SelectedItem.ToString());
                 this.Conexao.Open();
                 this.Conexao.DiscardInBuffer();
-                //this.txtResultadoSerial.AppendText("Enviado: #C7" + Environment.NewLine);
-                //this.Conexao.Write("#C7");
-                //th1is.txtResultadoSerial.AppendText(this.Conexao.ReadLine() + Environment.NewLine);
-                //this.txtResultadoSerial.AppendText("Enviado: #SS" + Environment.NewLine);
-                //this.Conexao.Write("#SS");
                 this.txtResultadoSerial.AppendText("Conectado com Sucesso" + Environment.NewLine);
 
                 // Limpa a lista
@@ -241,6 +257,45 @@
             // Abre a tela para apresentar o gráfico
             FrmChart frmChart = new FrmChart(this.ListaDouble);
             frmChart.ShowDialog();
+        }
+
+        /// <summary>
+        /// Evento click do botão de apresentação do gráfico da FFT dos dados
+        /// </summary>
+        /// <param name="sender">Objeto sender</param>
+        /// <param name="e">Objeto EventArgs</param>
+        private void btnApresentarFft_Click(object sender, EventArgs e)
+        {
+            // Abre a tela para apresentar o gráfico
+            FrmChart frmChart = new FrmChart(this.ListaDoubleFft);
+            frmChart.ShowDialog();
+        }
+
+        /// <summary>
+        /// Evento click do botão de cálculo da FFT dos dados
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnCalcularFft_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                this.btnApresentarFft.Enabled = this.ListaDoubleFft.Count > 0;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    string.Format(
+                        "[Erro]{1}{0}{1}{1}[StackTrace]{1}{2}{1} Porta: {3}{1} Velocidade: {4}",
+                        ex.Message,
+                        Environment.NewLine,
+                        ex.StackTrace,
+                        this.cmbPortas.SelectedItem == null ? "Nulo" : this.cmbPortas.SelectedItem.ToString(),
+                        this.cmbVelocidade.SelectedItem == null ? "Nulo" : this.cmbVelocidade.SelectedItem.ToString()),
+                    "Erro",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
         }
         #endregion
 
@@ -364,6 +419,9 @@
 
                 resultado += teste;
             }
+
+            this.btnAnalisar.Enabled = this.ListaDouble.Count > 0;
+            this.btnCalcularFft.Enabled = this.ListaDouble.Count > 0;
         }
         #endregion
         #endregion

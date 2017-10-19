@@ -39,6 +39,8 @@
             this.label2 = new System.Windows.Forms.Label();
             this.btnConectar = new System.Windows.Forms.Button();
             this.cmbPortas = new System.Windows.Forms.ComboBox();
+            this.btnCalcularFft = new System.Windows.Forms.Button();
+            this.btnApresentarFft = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // Conexao
@@ -52,7 +54,7 @@
             this.txtResultadoSerial.Name = "txtResultadoSerial";
             this.txtResultadoSerial.ReadOnly = true;
             this.txtResultadoSerial.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtResultadoSerial.Size = new System.Drawing.Size(762, 245);
+            this.txtResultadoSerial.Size = new System.Drawing.Size(762, 274);
             this.txtResultadoSerial.TabIndex = 0;
             // 
             // lblResultadoSerial
@@ -66,11 +68,12 @@
             // 
             // btnAnalisar
             // 
-            this.btnAnalisar.Location = new System.Drawing.Point(699, 317);
+            this.btnAnalisar.Enabled = false;
+            this.btnAnalisar.Location = new System.Drawing.Point(330, 25);
             this.btnAnalisar.Name = "btnAnalisar";
-            this.btnAnalisar.Size = new System.Drawing.Size(75, 23);
+            this.btnAnalisar.Size = new System.Drawing.Size(132, 25);
             this.btnAnalisar.TabIndex = 2;
-            this.btnAnalisar.Text = "Analisar";
+            this.btnAnalisar.Text = "Apresentar Gráfico";
             this.btnAnalisar.UseVisualStyleBackColor = true;
             this.btnAnalisar.Click += new System.EventHandler(this.btnAnalisar_Click);
             // 
@@ -147,11 +150,35 @@
             this.cmbPortas.Size = new System.Drawing.Size(97, 20);
             this.cmbPortas.TabIndex = 21;
             // 
+            // btnCalcularFft
+            // 
+            this.btnCalcularFft.Enabled = false;
+            this.btnCalcularFft.Location = new System.Drawing.Point(468, 25);
+            this.btnCalcularFft.Name = "btnCalcularFft";
+            this.btnCalcularFft.Size = new System.Drawing.Size(96, 25);
+            this.btnCalcularFft.TabIndex = 22;
+            this.btnCalcularFft.Text = "Calcular FFT";
+            this.btnCalcularFft.UseVisualStyleBackColor = true;
+            this.btnCalcularFft.Click += new System.EventHandler(this.btnCalcularFft_Click);
+            // 
+            // btnApresentarFft
+            // 
+            this.btnApresentarFft.Enabled = false;
+            this.btnApresentarFft.Location = new System.Drawing.Point(570, 25);
+            this.btnApresentarFft.Name = "btnApresentarFft";
+            this.btnApresentarFft.Size = new System.Drawing.Size(108, 25);
+            this.btnApresentarFft.TabIndex = 23;
+            this.btnApresentarFft.Text = "Apresentar FFT";
+            this.btnApresentarFft.UseVisualStyleBackColor = true;
+            this.btnApresentarFft.Click += new System.EventHandler(this.btnApresentarFft_Click);
+            // 
             // FrmPrincipal
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(786, 352);
+            this.Controls.Add(this.btnApresentarFft);
+            this.Controls.Add(this.btnCalcularFft);
             this.Controls.Add(this.cmbPortas);
             this.Controls.Add(this.btnConectar);
             this.Controls.Add(this.cmbVelocidade);
@@ -182,5 +209,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button btnConectar;
         private System.Windows.Forms.ComboBox cmbPortas;
+        private System.Windows.Forms.Button btnCalcularFft;
+        private System.Windows.Forms.Button btnApresentarFft;
     }
 }
