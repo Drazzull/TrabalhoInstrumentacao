@@ -280,7 +280,7 @@
         {
             try
             {
-                this.btnApresentarFft.Enabled = this.ListaDoubleFft.Count > 0;
+                this.CalcularDft(200, 'l');
             }
             catch (Exception ex)
             {
@@ -422,6 +422,64 @@
 
             this.btnAnalisar.Enabled = this.ListaDouble.Count > 0;
             this.btnCalcularFft.Enabled = this.ListaDouble.Count > 0;
+        }
+
+        /// <summary>
+        /// Realiza o cálculo da DFT
+        /// </summary>
+        /// <param name="frequenciaAmostragem">Frequência de amostragem</param>
+        /// <param name="tipo">Tipo do cálculo realizado</param>
+        private void CalcularDft(double frequenciaAmostragem, char tipo)
+        {
+            //------------------------------------------------------------------------//
+            // Classe..: TProcessamentoSinais                                         //
+            // Método..: dft() - Calcula o Espectro do Sinal.                         //
+            // Autor...: Geovani Rodrigo Scolaro.                                     //
+            // Data....: janeiro/2006.                                                //
+            // Entrada.: Nenhuma.                                                     //
+            // Saida...: Nenhuma.                                                     //
+            // Adaptado: Arthur Boesing Bilibio                                       //
+            //------------------------------------------------------------------------//
+            
+            double somaR = 0;
+            double somaI = 0;
+            double mag = 0;
+            double N = 0;
+            int k = 0;
+            int n = 0;
+
+            //Tamanho do Vetor de Magnitudes (FS/2).
+            N = frequenciaAmostragem / 2.0;
+
+            this.ListaDoubleFft.Clear();
+            for (k = 0; k < N; k++)
+            {
+                somaR = 0;
+                somaI = 0;
+
+                for (n = 0; n < (int)this.ListaDouble.Count; n++)
+                {
+                    somaR = somaR + this.ListaDouble[n] * Math.Cos((2.0 * Math.PI / frequenciaAmostragem) * k * n);
+                    somaI = somaI - this.ListaDouble[n] * Math.Sin((2.0 * Math.PI / frequenciaAmostragem) * k * n);
+                }
+
+                //Cálculo da Magnitude Linear ou em dB.
+                mag = Math.Sqrt(Math.Pow(somaR, 2) + Math.Pow(somaI, 2));
+
+                //Montagem do vetor com as Magnitudes do Sinal.
+                switch (tipo)
+                {
+                    case 'd':
+                        this.ListaDoubleFft.Add(20 * Math.Log10(mag));
+                        break;
+
+                    case 'l':
+                        this.ListaDoubleFft.Add(mag);
+                        break;
+                }
+            }
+
+            this.btnApresentarFft.Enabled = this.ListaDoubleFft.Count > 0;
         }
         #endregion
         #endregion

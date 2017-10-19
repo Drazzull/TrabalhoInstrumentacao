@@ -27,6 +27,11 @@
         double EixoY { get; set; }
 
         /// <summary>
+        /// Obtém o valor do eixo X para atualização do gráfico
+        /// </summary>
+        double EixoX { get; set; }
+
+        /// <summary>
         /// Obtém o valor do salto que o gráfico dará a cada update
         /// </summary>
         double Salto { get; set; }
@@ -156,6 +161,7 @@
 
                     string valorLinha = valor.ToString();
                     this.EixoY = Convert.ToDouble(valorLinha);
+                    this.EixoX = contador;
                     this.Invoke(new EventHandler(this.AdicionaPontoGrafico));
                 }
 
@@ -196,6 +202,7 @@
         private void AtualizarGrafico(object sender, EventArgs e)
         {
             this.grfTreinamento.Series[0].Points.Clear();
+            this.grfTreinamento.ChartAreas[0].AxisY.Minimum = -2500;
             this.grfTreinamento.ChartAreas[0].AxisX.Maximum = this.TamanhoEixoX;
         }
 
