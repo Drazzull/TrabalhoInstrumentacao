@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.IO.Ports;
     using System.Threading;
     using System.Windows.Forms;
@@ -422,6 +423,15 @@
 
             this.btnAnalisar.Enabled = this.ListaDouble.Count > 0;
             this.btnCalcularFft.Enabled = this.ListaDouble.Count > 0;
+
+            /*// Grava o arquivo com os pesos
+            using (StreamWriter sw = new StreamWriter("C:\\Users\\Avell 1555 IRON\\Desktop\\Teste\\teste.txt"))
+            {
+                foreach (double valor in this.ListaDouble)
+                {
+                    sw.Write(string.Format("{0}{1}", valor, Environment.NewLine));
+                }
+            }*/
         }
 
         /// <summary>

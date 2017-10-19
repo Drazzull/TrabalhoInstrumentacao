@@ -202,7 +202,6 @@
         private void AtualizarGrafico(object sender, EventArgs e)
         {
             this.grfTreinamento.Series[0].Points.Clear();
-            this.grfTreinamento.ChartAreas[0].AxisY.Minimum = -2500;
             this.grfTreinamento.ChartAreas[0].AxisX.Maximum = this.TamanhoEixoX;
         }
 
