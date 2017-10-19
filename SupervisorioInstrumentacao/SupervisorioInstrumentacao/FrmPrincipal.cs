@@ -22,6 +22,11 @@
         /// <summary>
         /// Lista que conterá os caracteres recebidos
         /// </summary>
+        private List<string> listaString;
+
+        /// <summary>
+        /// Lista que conterá os caracteres recebidos
+        /// </summary>
         private List<char> listaChar;
         #endregion
 
@@ -44,6 +49,22 @@
                 }
 
                 return this.listaBytes;
+            }
+        }
+
+        /// <summary>
+        /// Obtém ou define o valor da lista de bytes
+        /// </summary>
+        private List<string> ListaString
+        {
+            get
+            {
+                if (this.listaString == null)
+                {
+                    this.listaString = new List<string>();
+                }
+
+                return this.listaString;
             }
         }
 
@@ -130,13 +151,15 @@
                 }
 
                 // Inicia a conexão
+                this.Conexao.ReadBufferSize = 10000;
+                this.Conexao.WriteBufferSize = 10000;
                 this.Conexao.PortName = this.cmbPortas.SelectedItem.ToString();
                 this.Conexao.BaudRate = int.Parse(this.cmbVelocidade.SelectedItem.ToString());
                 this.Conexao.Open();
                 this.Conexao.DiscardInBuffer();
                 this.txtResultadoSerial.AppendText("Enviado: #C7" + Environment.NewLine);
                 this.Conexao.Write("#C7");
-                this.txtResultadoSerial.AppendText(this.Conexao.ReadLine());
+                this.txtResultadoSerial.AppendText(this.Conexao.ReadLine() + Environment.NewLine);
                 this.txtResultadoSerial.AppendText("Enviado: #SS" + Environment.NewLine);
                 this.Conexao.Write("#SS");
                 this.txtResultadoSerial.AppendText("Conectado com Sucesso" + Environment.NewLine);
@@ -145,7 +168,11 @@
                 this.ListaBytes.Clear();
 
                 // Aguarda 5 segundos
-                Thread.Sleep(5000);
+                int contador = 0;
+                do
+                {
+                    contador = this.Conexao.BytesToRead;
+                } while (contador < 6000);
 
                 // Verifica o número de bytes a serem lidos
                 int byteCount = this.Conexao.BytesToRead;
@@ -165,6 +192,9 @@
                 this.Conexao.Close();
 
                 this.txtResultadoSerial.AppendText("Serial Parada.");
+
+                // Tratar dados
+                this.TratarDados();
             }
             catch (Exception ex)
             {
@@ -206,7 +236,7 @@
         private void btnAnalisar_Click(object sender, EventArgs e)
         {
             // Abre a tela para apresentar o gráfico
-            FrmChart frmChart = new FrmChart();
+            FrmChart frmChart = new FrmChart(this.ListaDouble);
             frmChart.ShowDialog();
         }
         #endregion
@@ -303,6 +333,33 @@
         private void AlteraTxtResultado(object sender, EventArgs e)
         {
             this.txtResultadoSerial.AppendText(string.Format("Dados: {0}{1}", this.StringRx, Environment.NewLine));
+        }
+
+        /// <summary>
+        /// Tratamento dos dados recebidos pela serial
+        /// </summary>
+        private void TratarDados()
+        {
+            // Gera a mensagem de inicio do tratamento dos dados
+            this.txtResultadoSerial.AppendText("Iniciando o tratamento dos dados." + Environment.NewLine);
+
+            // Percorre os dados recebidos formatando e incluindo no cursor
+            string resultado = string.Empty;
+            foreach (char teste in this.ListaChar)
+            {
+                if (teste == '[')
+                {
+                    continue;
+                }
+
+                if (teste == ']')
+                {
+                    this.ListaDouble.Add(Convert.ToDouble(resultado));
+                    continue;
+                }
+
+                resultado += teste;
+            }
         }
         #endregion
         #endregion

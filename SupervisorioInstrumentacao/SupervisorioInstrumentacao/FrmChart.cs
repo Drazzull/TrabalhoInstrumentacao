@@ -1,6 +1,7 @@
 ﻿namespace SupervisorioInstrumentacao
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Threading;
     using System.Windows.Forms;
@@ -12,6 +13,11 @@
         /// Thread para processamento do arquivo;
         /// </summary>
         private Thread threadConfigurarGrafico;
+
+        /// <summary>
+        /// Lista que conterá os caracteres recebidos
+        /// </summary>
+        private List<double> listaDouble;
         #endregion
 
         #region Propriedades
@@ -45,15 +51,35 @@
                 return this.threadConfigurarGrafico;
             }
         }
+
+        /// <summary>
+        /// Obtém ou define o valor da lista de double
+        /// </summary>
+        private List<double> ListaDouble
+        {
+            get
+            {
+                if (this.listaDouble == null)
+                {
+                    this.listaDouble = new List<double>();
+                }
+
+                return this.listaDouble;
+            }
+        }
         #endregion
 
         #region Construtor
         /// <summary>
         /// Instancia uma instância da classe <see cref="FrmChart"/>
         /// </summary>
-        public FrmChart()
+        public FrmChart(IList<double> lista)
         {
+            // Inicializa os componentes
             this.InitializeComponent();
+
+            // Carrega a lista
+            this.ListaDouble.AddRange(lista);
         }
         #endregion
 
@@ -107,30 +133,18 @@
         {
             try
             {
-                // Número de linhas
-                int lineCount = 0;
-                using (StreamReader sr = new StreamReader(
-                    Path.Combine(Application.StartupPath, "treinamento.txt")))
-                {
-                    while (sr.ReadLine() != null)
-                    {
-                        lineCount++;
-                    }
-                }
-
                 // Limpa os pontos do gráfico
-                this.TamanhoEixoX = lineCount;
+                this.TamanhoEixoX = this.ListaDouble.Count;
                 this.Invoke(new EventHandler(this.AtualizarGrafico));
 
                 // Ajusta o salto
-                this.Salto = lineCount * 0.25;
+                this.Salto = this.TamanhoEixoX * 0.25;
 
                 // Atualiza o gráfico
                 this.Invoke(new EventHandler(this.UpdateGrafico));
 
                 // Atualiza o gráfico
-                using (StreamReader sr = new StreamReader(
-                    Path.Combine(Application.StartupPath, "treinamento.txt")))
+                foreach (double valor in this.ListaDouble)
                 {
                     int contador = 0;
                     while (true)
@@ -142,19 +156,16 @@
                             contador = 0;
                         }
 
-                        string valorLinha = sr.ReadLine();
+                        string valorLinha = valor.ToString();
                         if (string.IsNullOrEmpty(valorLinha))
                         {
                             this.Invoke(new EventHandler(this.UpdateGrafico));
                             break;
                         }
 
-                        string[] pontos = valorLinha.Split('|');
-                        this.EixoY = Convert.ToDouble(pontos[1].Replace('.', ','));
+                        this.EixoY = Convert.ToDouble(valorLinha.Replace('.', ','));
                         this.Invoke(new EventHandler(this.AdicionaPontoGrafico));
                     }
-
-                    sr.Close();
                 }
             }
             catch (Exception exp)
