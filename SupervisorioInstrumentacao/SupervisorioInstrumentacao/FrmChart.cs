@@ -42,6 +42,11 @@
         double TamanhoEixoX { get; set; }
 
         /// <summary>
+        /// Obtém o valor mínimo do eixo Y
+        /// </summary>
+        double MinimoY { get; set; }
+
+        /// <summary>
         /// Obtém o valor da thread de treinamento da rede
         /// </summary>
         private Thread ThreadConfigurarGrafico
@@ -158,10 +163,15 @@
                         this.Invoke(new EventHandler(this.UpdateGrafico));
                         contador = 0;
                     }
-
-                    string valorLinha = valor.ToString();
-                    this.EixoY = Convert.ToDouble(valorLinha);
+                    
+                    this.EixoY = valor;
                     this.EixoX = contador;
+
+                    if (valor < this.MinimoY)
+                    {
+                        this.MinimoY = valor;
+                    }
+
                     this.Invoke(new EventHandler(this.AdicionaPontoGrafico));
                 }
 
@@ -202,6 +212,7 @@
         private void AtualizarGrafico(object sender, EventArgs e)
         {
             this.grfTreinamento.Series[0].Points.Clear();
+            this.grfTreinamento.ChartAreas[0].AxisY.Minimum = this.MinimoY;
             this.grfTreinamento.ChartAreas[0].AxisX.Maximum = this.TamanhoEixoX;
         }
 
