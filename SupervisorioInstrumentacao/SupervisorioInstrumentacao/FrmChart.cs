@@ -161,6 +161,7 @@
                 foreach (double valor in this.ListaDouble)
                 {
                     contador++;
+                    //eixoX++;
                     if (contador > this.Salto)
                     {
                         this.Invoke(new EventHandler(this.UpdateGrafico));

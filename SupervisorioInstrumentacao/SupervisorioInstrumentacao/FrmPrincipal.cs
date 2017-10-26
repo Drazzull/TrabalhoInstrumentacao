@@ -31,9 +31,9 @@
         private List<char> listaChar;
 
         /// <summary>
-        /// Lista que conterá os valores da FFT
+        /// Lista que conterá os valores da DFT
         /// </summary>
-        private List<double> listaDoubleFft;
+        private List<double> listaDoubleDft;
         #endregion
 
         #region Propriedades
@@ -107,18 +107,18 @@
         }
 
         /// <summary>
-        /// Obtém ou define o valor da lista de doubles da FFT
+        /// Obtém ou define o valor da lista de doubles da DFT
         /// </summary>
-        private List<double> ListaDoubleFft
+        private List<double> ListaDoubleDft
         {
             get
             {
-                if (this.listaDoubleFft == null)
+                if (this.listaDoubleDft == null)
                 {
-                    this.listaDoubleFft = new List<double>();
+                    this.listaDoubleDft = new List<double>();
                 }
 
-                return this.listaDoubleFft;
+                return this.listaDoubleDft;
             }
         }
 
@@ -161,7 +161,7 @@
             */
 
             this.btnAnalisar.Enabled = this.ListaDouble.Count > 0;
-            this.btnCalcularFft.Enabled = this.ListaDouble.Count > 0;
+            this.btnCalcularDft.Enabled = this.ListaDouble.Count > 0;
         }
         #endregion
 
@@ -265,27 +265,27 @@
         }
 
         /// <summary>
-        /// Evento click do botão de apresentação do gráfico da FFT dos dados
+        /// Evento click do botão de apresentação do gráfico da DFT dos dados
         /// </summary>
         /// <param name="sender">Objeto sender</param>
         /// <param name="e">Objeto EventArgs</param>
-        private void btnApresentarFft_Click(object sender, EventArgs e)
+        private void btnApresentarDft_Click(object sender, EventArgs e)
         {
             // Abre a tela para apresentar o gráfico
-            FrmChart frmChart = new FrmChart(this.ListaDoubleFft, "Resultado FFT");
+            FrmChart frmChart = new FrmChart(this.ListaDoubleDft, "Resultado DFT");
             frmChart.ShowDialog();
         }
 
         /// <summary>
-        /// Evento click do botão de cálculo da FFT dos dados
+        /// Evento click do botão de cálculo da DFT dos dados
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void btnCalcularFft_Click(object sender, EventArgs e)
+        private void btnCalcularDft_Click(object sender, EventArgs e)
         {
             try
             {
-                this.CalcularFft(200, 'l');
+                this.CalcularDft(200, 'l');
 
                 this.txtResultadoSerial.AppendText("Cálculo OK." + Environment.NewLine);
             }
@@ -428,7 +428,7 @@
             }
 
             this.btnAnalisar.Enabled = this.ListaDouble.Count > 0;
-            this.btnCalcularFft.Enabled = this.ListaDouble.Count > 0;
+            this.btnCalcularDft.Enabled = this.ListaDouble.Count > 0;
 
             /*// Grava o arquivo com os pesos
             using (StreamWriter sw = new StreamWriter("C:\\Users\\Avell 1555 IRON\\Desktop\\Teste\\teste.txt"))
@@ -441,15 +441,15 @@
         }
 
         /// <summary>
-        /// Realiza o cálculo da FFT
+        /// Realiza o cálculo da DFT
         /// </summary>
         /// <param name="frequenciaAmostragem">Frequência de amostragem</param>
         /// <param name="tipo">Tipo do cálculo realizado</param>
-        private void CalcularFft(double frequenciaAmostragem, char tipo)
+        private void CalcularDft(double frequenciaAmostragem, char tipo)
         {
             //------------------------------------------------------------------------//
             // Classe..: TProcessamentoSinais                                         //
-            // Método..: fft() - Calcula o Espectro do Sinal.                         //
+            // Método..: dft() - Calcula o Espectro do Sinal.                         //
             // Autor...: Geovani Rodrigo Scolaro.                                     //
             // Data....: janeiro/2006.                                                //
             // Entrada.: Nenhuma.                                                     //
@@ -467,7 +467,7 @@
             //Tamanho do Vetor de Magnitudes (FS/2).
             N = frequenciaAmostragem / 2.0;
 
-            this.ListaDoubleFft.Clear();
+            this.ListaDoubleDft.Clear();
             for (k = 0; k < N; k++)
             {
                 somaR = 0;
@@ -486,16 +486,16 @@
                 switch (tipo)
                 {
                     case 'd':
-                        this.ListaDoubleFft.Add(20 * Math.Log10(mag));
+                        this.ListaDoubleDft.Add(20 * Math.Log10(mag));
                         break;
 
                     case 'l':
-                        this.ListaDoubleFft.Add(mag);
+                        this.ListaDoubleDft.Add(mag);
                         break;
                 }
             }
 
-            this.btnApresentarFft.Enabled = this.ListaDoubleFft.Count > 0;
+            this.btnApresentarDft.Enabled = this.ListaDoubleDft.Count > 0;
         }
         #endregion
         #endregion

@@ -39,8 +39,8 @@
             this.label2 = new System.Windows.Forms.Label();
             this.btnConectar = new System.Windows.Forms.Button();
             this.cmbPortas = new System.Windows.Forms.ComboBox();
-            this.btnCalcularFft = new System.Windows.Forms.Button();
-            this.btnApresentarFft = new System.Windows.Forms.Button();
+            this.btnCalcularDft = new System.Windows.Forms.Button();
+            this.btnApresentarDft = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtResultadoSerial
@@ -146,35 +146,35 @@
             this.cmbPortas.Size = new System.Drawing.Size(97, 20);
             this.cmbPortas.TabIndex = 21;
             // 
-            // btnCalcularFft
+            // btnCalcularDft
             // 
-            this.btnCalcularFft.Enabled = false;
-            this.btnCalcularFft.Location = new System.Drawing.Point(468, 25);
-            this.btnCalcularFft.Name = "btnCalcularFft";
-            this.btnCalcularFft.Size = new System.Drawing.Size(96, 25);
-            this.btnCalcularFft.TabIndex = 22;
-            this.btnCalcularFft.Text = "Calcular FFT";
-            this.btnCalcularFft.UseVisualStyleBackColor = true;
-            this.btnCalcularFft.Click += new System.EventHandler(this.btnCalcularFft_Click);
+            this.btnCalcularDft.Enabled = false;
+            this.btnCalcularDft.Location = new System.Drawing.Point(468, 25);
+            this.btnCalcularDft.Name = "btnCalcularDft";
+            this.btnCalcularDft.Size = new System.Drawing.Size(96, 25);
+            this.btnCalcularDft.TabIndex = 22;
+            this.btnCalcularDft.Text = "Calcular DFT";
+            this.btnCalcularDft.UseVisualStyleBackColor = true;
+            this.btnCalcularDft.Click += new System.EventHandler(this.btnCalcularDft_Click);
             // 
-            // btnApresentarFft
+            // btnApresentarDft
             // 
-            this.btnApresentarFft.Enabled = false;
-            this.btnApresentarFft.Location = new System.Drawing.Point(570, 25);
-            this.btnApresentarFft.Name = "btnApresentarFft";
-            this.btnApresentarFft.Size = new System.Drawing.Size(108, 25);
-            this.btnApresentarFft.TabIndex = 23;
-            this.btnApresentarFft.Text = "Apresentar FFT";
-            this.btnApresentarFft.UseVisualStyleBackColor = true;
-            this.btnApresentarFft.Click += new System.EventHandler(this.btnApresentarFft_Click);
+            this.btnApresentarDft.Enabled = false;
+            this.btnApresentarDft.Location = new System.Drawing.Point(570, 25);
+            this.btnApresentarDft.Name = "btnApresentarDft";
+            this.btnApresentarDft.Size = new System.Drawing.Size(108, 25);
+            this.btnApresentarDft.TabIndex = 23;
+            this.btnApresentarDft.Text = "Apresentar DFT";
+            this.btnApresentarDft.UseVisualStyleBackColor = true;
+            this.btnApresentarDft.Click += new System.EventHandler(this.btnApresentarDft_Click);
             // 
             // FrmPrincipal
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(786, 352);
-            this.Controls.Add(this.btnApresentarFft);
-            this.Controls.Add(this.btnCalcularFft);
+            this.Controls.Add(this.btnApresentarDft);
+            this.Controls.Add(this.btnCalcularDft);
             this.Controls.Add(this.cmbPortas);
             this.Controls.Add(this.btnConectar);
             this.Controls.Add(this.cmbVelocidade);
@@ -205,7 +205,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button btnConectar;
         private System.Windows.Forms.ComboBox cmbPortas;
-        private System.Windows.Forms.Button btnCalcularFft;
-        private System.Windows.Forms.Button btnApresentarFft;
+        private System.Windows.Forms.Button btnCalcularDft;
+        private System.Windows.Forms.Button btnApresentarDft;
     }
 }
