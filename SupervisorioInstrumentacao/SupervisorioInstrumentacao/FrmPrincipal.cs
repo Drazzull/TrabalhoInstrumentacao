@@ -142,6 +142,26 @@
             // Inicializa o estado dos componentes
             this.cmbVelocidade.SelectedIndex = 0;
             this.AlterarEstadoComponentes();
+
+            /*
+            // Leitura dos dados para depuração off-line
+            try
+            {
+                using (StreamReader sr = new StreamReader(Application.StartupPath + "\\ValoresSerial.txt"))
+                {
+                    while (!sr.EndOfStream)
+                    {
+                        this.ListaDouble.Add(System.Convert.ToDouble(sr.ReadLine()));
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            this.btnAnalisar.Enabled = this.ListaDouble.Count > 0;
+            this.btnCalcularFft.Enabled = this.ListaDouble.Count > 0;
+            */
         }
         #endregion
 
@@ -256,7 +276,7 @@
         private void btnAnalisar_Click(object sender, EventArgs e)
         {
             // Abre a tela para apresentar o gráfico
-            FrmChart frmChart = new FrmChart(this.ListaDouble);
+            FrmChart frmChart = new FrmChart(this.ListaDouble, "Dados Recebidos");
             frmChart.ShowDialog();
         }
 
@@ -268,7 +288,7 @@
         private void btnApresentarFft_Click(object sender, EventArgs e)
         {
             // Abre a tela para apresentar o gráfico
-            FrmChart frmChart = new FrmChart(this.ListaDoubleFft);
+            FrmChart frmChart = new FrmChart(this.ListaDoubleFft, "Resultado FFT");
             frmChart.ShowDialog();
         }
 
@@ -450,7 +470,7 @@
             // Saida...: Nenhuma.                                                     //
             // Adaptado: Arthur Boesing Bilibio                                       //
             //------------------------------------------------------------------------//
-            
+
             double somaR = 0;
             double somaI = 0;
             double mag = 0;

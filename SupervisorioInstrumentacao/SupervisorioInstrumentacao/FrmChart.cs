@@ -83,10 +83,12 @@
         /// <summary>
         /// Instancia uma instância da classe <see cref="FrmChart"/>
         /// </summary>
-        public FrmChart(IList<double> lista)
+        public FrmChart(IList<double> lista, string titulo)
         {
             // Inicializa os componentes
             this.InitializeComponent();
+
+            this.grfTreinamento.Titles[0].Text = titulo;
 
             // Carrega a lista
             this.ListaDouble.AddRange(lista);
@@ -152,9 +154,10 @@
 
                 // Atualiza o gráfico
                 this.Invoke(new EventHandler(this.UpdateGrafico));
-
+                
                 // Atualiza o gráfico
                 int contador = 0;
+                int eixoX = 0;
                 foreach (double valor in this.ListaDouble)
                 {
                     contador++;
@@ -163,9 +166,9 @@
                         this.Invoke(new EventHandler(this.UpdateGrafico));
                         contador = 0;
                     }
-                    
+
                     this.EixoY = valor;
-                    this.EixoX = contador;
+                    this.EixoX = eixoX;
 
                     if (valor < this.MinimoY)
                     {
@@ -173,6 +176,7 @@
                     }
 
                     this.Invoke(new EventHandler(this.AdicionaPontoGrafico));
+                    eixoX++;
                 }
 
                 this.Invoke(new EventHandler(this.UpdateGrafico));
@@ -201,7 +205,7 @@
         /// <param name="e">Objeto EventArgs</param>
         private void AdicionaPontoGrafico(object sender, EventArgs e)
         {
-            this.grfTreinamento.Series[0].Points.AddY(this.EixoY);
+            this.grfTreinamento.Series[0].Points.AddXY(this.EixoX, this.EixoY);
         }
 
         /// <summary>
@@ -213,6 +217,7 @@
         {
             this.grfTreinamento.Series[0].Points.Clear();
             this.grfTreinamento.ChartAreas[0].AxisY.Minimum = this.MinimoY;
+            this.grfTreinamento.ChartAreas[0].AxisX.Minimum = 0;
             this.grfTreinamento.ChartAreas[0].AxisX.Maximum = this.TamanhoEixoX;
         }
 
