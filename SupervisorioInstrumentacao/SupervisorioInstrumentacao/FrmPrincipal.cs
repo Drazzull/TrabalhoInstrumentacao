@@ -158,10 +158,10 @@
             catch
             {
             }
+            */
 
             this.btnAnalisar.Enabled = this.ListaDouble.Count > 0;
             this.btnCalcularFft.Enabled = this.ListaDouble.Count > 0;
-            */
         }
         #endregion
 
@@ -301,7 +301,7 @@
         {
             try
             {
-                this.CalcularDft(200, 'l');
+                this.CalcularFft(200, 'l');
             }
             catch (Exception ex)
             {
@@ -455,15 +455,15 @@
         }
 
         /// <summary>
-        /// Realiza o cálculo da DFT
+        /// Realiza o cálculo da FFT
         /// </summary>
         /// <param name="frequenciaAmostragem">Frequência de amostragem</param>
         /// <param name="tipo">Tipo do cálculo realizado</param>
-        private void CalcularDft(double frequenciaAmostragem, char tipo)
+        private void CalcularFft(double frequenciaAmostragem, char tipo)
         {
             //------------------------------------------------------------------------//
             // Classe..: TProcessamentoSinais                                         //
-            // Método..: dft() - Calcula o Espectro do Sinal.                         //
+            // Método..: fft() - Calcula o Espectro do Sinal.                         //
             // Autor...: Geovani Rodrigo Scolaro.                                     //
             // Data....: janeiro/2006.                                                //
             // Entrada.: Nenhuma.                                                     //

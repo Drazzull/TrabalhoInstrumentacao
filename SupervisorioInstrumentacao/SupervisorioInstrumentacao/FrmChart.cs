@@ -154,7 +154,7 @@
 
                 // Atualiza o gráfico
                 this.Invoke(new EventHandler(this.UpdateGrafico));
-                
+
                 // Atualiza o gráfico
                 int contador = 0;
                 int eixoX = 0;
