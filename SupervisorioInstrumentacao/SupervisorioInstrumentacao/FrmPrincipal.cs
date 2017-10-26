@@ -231,7 +231,7 @@
                 this.Conexao.Write("#P");
                 this.Conexao.Close();
 
-                this.txtResultadoSerial.AppendText("Serial Parada.");
+                this.txtResultadoSerial.AppendText("Serial Parada." + Environment.NewLine);
 
                 // Tratar dados
                 this.TratarDados();
@@ -249,22 +249,6 @@
                     "Erro",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
-            }
-        }
-
-        /// <summary>
-        /// Evento DataReceived da conexão serial
-        /// </summary>
-        /// <param name="sender">Objeto Sender</param>
-        /// <param name="e">Objeto SerialDataReceivedEventArgs</param>
-        private void Conexao_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            try
-            {
-
-            }
-            catch
-            {
             }
         }
 
@@ -302,6 +286,8 @@
             try
             {
                 this.CalcularFft(200, 'l');
+
+                this.txtResultadoSerial.AppendText("Cálculo OK." + Environment.NewLine);
             }
             catch (Exception ex)
             {

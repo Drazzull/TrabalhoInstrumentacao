@@ -43,10 +43,6 @@
             this.btnApresentarFft = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // Conexao
-            // 
-            this.Conexao.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.Conexao_DataReceived);
-            // 
             // txtResultadoSerial
             // 
             this.txtResultadoSerial.Location = new System.Drawing.Point(12, 66);
