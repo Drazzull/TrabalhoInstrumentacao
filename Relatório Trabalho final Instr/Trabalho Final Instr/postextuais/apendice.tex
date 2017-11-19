@@ -1,0 +1,572 @@
+\begin{apendicesenv}
+	
+\chapter*{Apêndice A - Código fonte do Firmware}
+
+\begin{lstlisting}[style=CPP]
+#include <xc.h>
+#include <stdlib.h>
+#include <math.h>
+
+#define _XTAL_FREQ	   20000000 
+#pragma config FOSC  = HS   
+#pragma config WDTE  = OFF  	
+#pragma config PWRTE = ON   	
+#pragma config BOREN = OFF		
+#pragma config LVP   = OFF  	
+#pragma config CPD   = OFF  	
+#pragma config CP    = OFF  	
+
+unsigned short ADCResult = 0;
+int picos = 0, flag = 0;
+
+void USARTInit(long BaudRate, int Mode)
+{
+int BR = 0;
+
+
+if (Mode == 0)		
+{
+BR = (_XTAL_FREQ / (64 * BaudRate)) - 1;
+SPBRG = BR;
+}
+else				
+{
+BR = (_XTAL_FREQ / (16 * BaudRate)) - 1;
+SPBRG = BR;
+}
+
+
+TXSTAbits.CSRC	= 1;	
+TXSTAbits.TX9	= 0;	
+TXSTAbits.TXEN	= 1; 	
+TXSTAbits.SYNC	= 0; 
+TXSTAbits.BRGH	= Mode;	
+TXSTAbits.TRMT	= 1;	
+TXSTAbits.TX9D	= 0;	
+
+
+RCSTAbits.SPEN	= 1;	
+RCSTAbits.RX9	= 0;   
+RCSTAbits.SREN	= 0;	
+RCSTAbits.CREN	= 1;   	
+RCSTAbits.ADDEN	= 0;  
+RCSTAbits.FERR	= 0;	
+RCSTAbits.OERR	= 0;	
+RCSTAbits.RX9D	= 0;	
+
+PIE1bits.RCIE 	= 1;
+PIR1bits.RCIF 	= 0;	
+}
+
+void USARTWriteChar(unsigned char USARTData)
+{
+while(!PIR1bits.TXIF);
+TXREG = USARTData;
+}
+
+
+void USARTWriteString(const char *str)
+{
+
+while(*str != '\0')
+{
+
+USARTWriteChar(*str);
+str++;
+}
+}
+
+
+void ADCInit()
+{
+
+ADCON1bits.ADFM 	= 1;	
+
+
+ADCON1bits.PCFG3 	= 0;	
+ADCON1bits.PCFG2 	= 0;	
+ADCON1bits.PCFG1 	= 0;	
+ADCON1bits.PCFG0 	= 0;	
+
+ADCON0bits.ADCS1 	= 1;	
+ADCON0bits.ADCS0 	= 0;	
+
+ADCON0bits.CHS2		= 1;	
+ADCON0bits.CHS1		= 0;	
+ADCON0bits.CHS0		= 1;	
+
+ADCON0bits.ADON		= 1;
+
+
+PIE1bits.ADIE 		= 1;	
+PIR1bits.ADIF 		= 0;	/	
+}
+
+
+void ADCRead()
+{
+
+__delay_us(25); 		
+ADCON0bits.GO = 1;			
+while(ADCON0bits.GO_DONE);	
+}
+
+
+void TMRInit(){
+
+T1CONbits.T1OSCEN = 0;
+T1CONbits.T1CKPS1 = 1; 
+T1CONbits.T1CKPS0 = 1;
+T1CONbits.TMR1ON = 1;
+PIE1bits.TMR1IE = 1;
+
+}
+
+void interrupt ISR(void)
+{
+
+if (PIR1bits.TMR1IF)
+{		
+
+TMR1 = 62411;	
+
+ADCRead();  
+PIR1bits.TMR1IF = 0; 
+}
+
+if (PIR1bits.ADIF)
+{	
+ADCResult = ((ADRESH << 8) + ADRESL);
+
+
+char * buf;
+float input;
+int status;
+
+input = ADCResult * 0.0048828125; 
+buf = ftoa(input, &status);	 
+USARTWriteString("[");
+USARTWriteString(buf);
+USARTWriteString("]");
+
+PIR1bits.ADIF = 0;	
+}
+}
+
+void main(void)
+{
+TRISB	= 0x00;			
+PORTB	= 0; 	
+TRISC	= 0x80;			
+PORTC	= 0;  				
+TRISD	= 0x00;			
+PORTD	= 0;	
+TRISE	= 0xFF;			
+PORTE	= 0;  				
+
+TMRInit();				
+USARTInit(110000,1);	
+ADCInit();			
+
+INTCONbits.PEIE	= 1;	
+INTCONbits.GIE	= 1;	
+while(1)			
+{		
+
+}
+}	
+\end{lstlisting}
+
+	
+
+\chapter*{Apêndice B - Código fonte do Software Supervisório}
+
+\begin{lstlisting}[language={[Sharp]C}]
+namespace SupervisorioInstrumentacao
+{
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Ports;
+using System.Threading;
+using System.Windows.Forms;
+
+public partial class FrmPrincipal : Form
+{
+#region Campos
+
+private List<byte> listaBytes;
+
+private List<double> listaDouble;
+
+private List<string> listaString;
+
+private List<char> listaChar;
+
+private List<double> listaDoubleDft;
+#endregion
+
+#region Propriedades
+
+private string StringRx { get; set; }
+
+
+private List<byte> ListaBytes
+{
+get
+{
+if (this.listaBytes == null)
+{
+this.listaBytes = new List<byte>();
+}
+
+return this.listaBytes;
+}
+}
+
+private List<string> ListaString
+{
+get
+{
+if (this.listaString == null)
+{
+this.listaString = new List<string>();
+}
+
+return this.listaString;
+}
+}
+
+private List<char> ListaChar
+{
+get
+{
+if (this.listaChar == null)
+{
+this.listaChar = new List<char>();
+}
+
+return this.listaChar;
+}
+}
+
+private List<double> ListaDouble
+{
+get
+{
+if (this.listaDouble == null)
+{
+this.listaDouble = new List<double>();
+}
+
+return this.listaDouble;
+}
+}
+
+private List<double> ListaDoubleDft
+{
+get
+{
+if (this.listaDoubleDft == null)
+{
+this.listaDoubleDft = new List<double>();
+}
+
+return this.listaDoubleDft;
+}
+}
+
+private DateTime TerminoLeituraDados { get; set; }
+#endregion
+
+#region Construtor
+
+public FrmPrincipal()
+{
+this.InitializeComponent();
+
+this.CarregarListaPortas();
+
+
+this.cmbVelocidade.SelectedIndex = 0;
+this.AlterarEstadoComponentes();
+
+this.btnAnalisar.Enabled = this.ListaDouble.Count > 0;
+this.btnCalcularDft.Enabled = this.ListaDouble.Count > 0;
+}
+#endregion
+
+#region Metodos
+#region Componentes do Form
+
+private void btnRecarregarPortas_Click(object sender, EventArgs e)
+{
+this.CarregarListaPortas();
+}
+
+private void btnConectar_Click(object sender, EventArgs e)
+{
+try
+{
+if ((this.cmbPortas.SelectedItem == null) ||
+string.IsNullOrEmpty(this.cmbPortas.SelectedItem.ToString()))
+{
+throw new Exception("A porta selecionada e invalida.");
+}
+
+this.Conexao.ReadBufferSize = 20000;
+this.Conexao.WriteBufferSize = 20000;
+this.Conexao.PortName = this.cmbPortas.SelectedItem.ToString();
+this.Conexao.BaudRate = int.Parse(this.cmbVelocidade.SelectedItem.ToString());
+this.Conexao.Open();
+this.Conexao.DiscardInBuffer();
+this.txtResultadoSerial.AppendText("Conectado com Sucesso" + Environment.NewLine);
+
+
+this.ListaBytes.Clear();
+this.ListaChar.Clear();
+this.ListaDouble.Clear();
+this.Conexao.DiscardInBuffer();
+
+int contador = 0;
+do
+{
+contador = this.Conexao.BytesToRead;
+} while (contador < 10000);
+
+int byteCount = this.Conexao.BytesToRead;
+
+char[] buffer = new char[byteCount];
+
+
+int readBytes = this.Conexao.Read(buffer, 0, byteCount);
+
+this.ListaChar.AddRange(buffer);
+
+
+this.txtResultadoSerial.AppendText("Enviado: #P" + Environment.NewLine);
+this.Conexao.Write("#P");
+this.Conexao.Close();
+
+this.txtResultadoSerial.AppendText("Serial Parada." + Environment.NewLine);
+
+
+this.TratarDados();
+}
+catch (Exception ex)
+{
+MessageBox.Show(
+string.Format(
+"[Erro]{1}{0}{1}{1}[StackTrace]{1}{2}{1} Porta: {3}{1} Velocidade: {4}",
+ex.Message,
+Environment.NewLine,
+ex.StackTrace,
+this.cmbPortas.SelectedItem == null ? "Nulo" : this.cmbPortas.SelectedItem.ToString(),
+this.cmbVelocidade.SelectedItem == null ? "Nulo" : this.cmbVelocidade.SelectedItem.ToString()),
+"Erro",
+MessageBoxButtons.OK,
+MessageBoxIcon.Error);
+}
+}
+
+private void btnAnalisar_Click(object sender, EventArgs e)
+{
+
+FrmChart frmChart = new FrmChart(this.ListaDouble, "Dados Recebidos");
+frmChart.ShowDialog();
+}
+
+private void btnApresentarDft_Click(object sender, EventArgs e)
+{
+
+FrmChart frmChart = new FrmChart(this.ListaDoubleDft, "Resultado DFT");
+frmChart.ShowDialog();
+}
+
+private void btnCalcularDft_Click(object sender, EventArgs e)
+{
+try
+{
+this.CalcularDft(200, 'l');
+
+this.txtResultadoSerial.AppendText("Calculo OK." + Environment.NewLine);
+}
+catch (Exception ex)
+{
+MessageBox.Show(
+string.Format(
+"[Erro]{1}{0}{1}{1}[StackTrace]{1}{2}{1} Porta: {3}{1} Velocidade: {4}",
+ex.Message,
+Environment.NewLine,
+ex.StackTrace,
+this.cmbPortas.SelectedItem == null ? "Nulo" : this.cmbPortas.SelectedItem.ToString(),
+this.cmbVelocidade.SelectedItem == null ? "Nulo" : this.cmbVelocidade.SelectedItem.ToString()),
+"Erro",
+MessageBoxButtons.OK,
+MessageBoxIcon.Error);
+}
+}
+#endregion
+
+#region Privados
+
+private void CarregarListaPortas()
+{
+try
+{
+
+string portaConectada = string.Empty;
+if (this.cmbPortas.SelectedValue != null)
+{
+portaConectada = this.cmbPortas.SelectedValue.ToString();
+}
+
+this.cmbPortas.Items.Clear();
+
+string[] ports = SerialPort.GetPortNames();
+foreach (string port in ports)
+{
+int convert = 0;
+if (!int.TryParse(port.Substring(3), out convert))
+{
+continue;
+}
+
+this.cmbPortas.Items.Add("COM" + convert.ToString());
+}
+
+for (int i = 0; i < this.cmbPortas.Items.Count; i++)
+{
+if (this.cmbPortas.Items[i].ToString() == portaConectada)
+{
+this.cmbPortas.SelectedIndex = i;
+}
+}
+
+this.AlterarEstadoComponentes();
+}
+catch (Exception ex)
+{
+MessageBox.Show(
+string.Format(
+"Ocorreu o seguinte erro ao atualizar as portas:{0}[Erro]{1}{0}Tente novamente.",
+Environment.NewLine,
+ex.Message),
+"Erro",
+MessageBoxButtons.OK,
+MessageBoxIcon.Error);
+}
+}
+
+private void AlterarEstadoComponentes()
+{
+try
+{
+
+this.cmbPortas.Enabled = this.cmbPortas.Items.Count > 0;
+this.btnConectar.Enabled = this.cmbPortas.Items.Count > 0;
+if ((this.cmbPortas.Items.Count > 0) && (this.cmbPortas.SelectedValue == null))
+{
+this.cmbPortas.SelectedIndex = 0;
+}
+}
+catch (Exception ex)
+{
+MessageBox.Show(
+string.Format(
+"Ocorreu o seguinte erro ao atualizar os componentes:{0}[Erro]{1}{0}",
+Environment.NewLine,
+ex.Message),
+"Erro",
+MessageBoxButtons.OK,
+MessageBoxIcon.Error);
+}
+}
+
+private void AlteraTxtResultado(object sender, EventArgs e)
+{
+this.txtResultadoSerial.AppendText(string.Format("Dados: {0}{1}", this.StringRx, Environment.NewLine));
+}
+
+private void TratarDados()
+{
+
+this.txtResultadoSerial.AppendText("Iniciando o tratamento dos dados." + Environment.NewLine);
+
+string resultado = string.Empty;
+foreach (char teste in this.ListaChar)
+{
+if (teste == '[')
+{
+resultado = string.Empty;
+continue;
+}
+
+if (teste == ']')
+{
+this.ListaDouble.Add(Convert.ToDouble(resultado.Replace('.', ',')));
+continue;
+}
+
+resultado += teste;
+}
+
+this.btnAnalisar.Enabled = this.ListaDouble.Count > 0;
+this.btnCalcularDft.Enabled = this.ListaDouble.Count > 0;
+
+}
+
+private void CalcularDft(double frequenciaAmostragem, char tipo)
+{
+ 
+double somaR = 0;
+double somaI = 0;
+double mag = 0;
+double N = 0;
+int k = 0;
+int n = 0;
+
+
+N = frequenciaAmostragem / 2.0;
+
+this.ListaDoubleDft.Clear();
+for (k = 0; k < N; k++)
+{
+somaR = 0;
+somaI = 0;
+
+for (n = 0; n < (int)this.ListaDouble.Count; n++)
+{
+somaR = somaR + this.ListaDouble[n] * Math.Cos((2.0 * Math.PI / frequenciaAmostragem) * k * n);
+somaI = somaI - this.ListaDouble[n] * Math.Sin((2.0 * Math.PI / frequenciaAmostragem) * k * n);
+}
+
+
+mag = Math.Sqrt(Math.Pow(somaR, 2) + Math.Pow(somaI, 2));
+
+
+switch (tipo)
+{
+case 'd':
+this.ListaDoubleDft.Add(20 * Math.Log10(mag));
+break;
+
+case 'l':
+this.ListaDoubleDft.Add(mag);
+break;
+}
+}
+
+this.btnApresentarDft.Enabled = this.ListaDoubleDft.Count > 0;
+}
+#endregion
+#endregion
+}
+}
+\end{lstlisting}
+
+
+
+\end{apendicesenv}
+
+
